@@ -7,10 +7,78 @@
   --text: #e8dcdc;
   --muted: #a08f91;
   --blood: #b3122e;
+  --tabbar-h: 56px;
   background: var(--bg);
   color: var(--text);
 }
 
 body {
   margin: 0;
+}
+
+button {
+  font: inherit;
+  color: inherit;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 6px 12px;
+  cursor: pointer;
+}
+button:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+button.primary {
+  background: var(--blood);
+  border-color: var(--blood);
+  padding: 10px;
+}
+button.primary:disabled {
+  background: var(--line);
+  border-color: var(--line);
+}
+button.danger {
+  border-color: var(--blood);
+  color: #ff8a9b;
+}
+
+.section-title {
+  margin: 8px 0 0;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--muted);
+}
+
+.card {
+  display: grid;
+  gap: 8px;
+  padding: 12px;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+}
+
+.muted {
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.bar {
+  display: block;
+  height: 8px;
+  background: var(--line);
+  border-radius: 4px;
+  overflow: hidden;
+}
+.bar > .fill {
+  display: block;
+  height: 100%;
+  background: var(--blood);
+}
+
+.tab-body {
+  display: grid;
+  gap: 8px;
+  align-content: start;
 }

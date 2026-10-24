@@ -1,5 +1,6 @@
 import { COMBAT } from '../data/combat'
 import { D, type Decimal } from './decimal'
+import type { Notation } from './format'
 
 export interface Resources {
   blood: Decimal
@@ -23,6 +24,7 @@ export interface Stats {
   /** Blood earned in current run (prestige basis). */
   bloodEarnedRun: Decimal
   bloodEarnedTotal: Decimal
+  bonesEarnedTotal: Decimal
   kills: number
   bossKills: number
   clicks: number
@@ -36,6 +38,7 @@ export interface Stats {
 /** Survive every prestige. */
 export interface Settings {
   autoBuyBlood: boolean
+  notation: Notation
 }
 
 export interface Upgrades {
@@ -61,6 +64,7 @@ export function createInitialState(): GameState {
       playTime: 0,
       bloodEarnedRun: D(0),
       bloodEarnedTotal: D(0),
+      bonesEarnedTotal: D(0),
       kills: 0,
       bossKills: 0,
       clicks: 0,
@@ -69,6 +73,6 @@ export function createInitialState(): GameState {
       maxStage: 1,
       prestiges: {},
     },
-    settings: { autoBuyBlood: true },
+    settings: { autoBuyBlood: true, notation: 'scientific' },
   }
 }

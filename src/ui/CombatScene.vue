@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { COMBAT } from '../data/combat'
-import { autoBitesPerSecond, autoDps, biteDamage, enemyMaxHp, enemyName, formatNumber, isBoss } from '../engine'
-import { frame, playerBite, state } from './game'
+import { autoBitesPerSecond, autoDps, biteDamage, enemyMaxHp, enemyName, isBoss } from '../engine'
+import { fmt, frame, playerBite, state } from './game'
 
 const view = computed(() => {
   void frame.value
@@ -14,11 +14,11 @@ const view = computed(() => {
     boss,
     progress: boss ? 'BOSS' : `Enemy ${c.enemyIndex + 1} / ${COMBAT.enemiesPerStage}`,
     name: enemyName(state),
-    hp: formatNumber(c.enemyHp),
-    maxHp: formatNumber(max),
+    hp: fmt(c.enemyHp),
+    maxHp: fmt(max),
     pct: c.enemyHp.div(max).toNumber() * 100,
-    bite: formatNumber(biteDamage(state)),
-    dps: formatNumber(autoDps(state)),
+    bite: fmt(biteDamage(state)),
+    dps: fmt(autoDps(state)),
     bats: autoBitesPerSecond(state),
   }
 })
@@ -29,37 +29,34 @@ const view = computed(() => {
     <div class="meta">Stage {{ view.stage }} · {{ view.progress }}</div>
     <button class="enemy" :class="{ boss: view.boss }" @pointerdown.prevent="playerBite">
       <span class="name">{{ view.name }}</span>
-      <span class="bar"><span class="fill" :style="{ width: view.pct + '%' }" /></span>
+      <span class="bar hp-bar"><span class="fill" :style="{ width: view.pct + '%' }" /></span>
       <span class="hp">{{ view.hp }} / {{ view.maxHp }}</span>
     </button>
-    <div class="hint">Tap to bite · Bite {{ view.bite }} · DPS {{ view.dps }}<template v-if="view.bats"> · Bats {{ view.bats }}/s</template></div>
+    <div class="meta">
+      Bite {{ view.bite }} · DPS {{ view.dps }}<template v-if="view.bats"> · Bats {{ view.bats }}/s</template>
+    </div>
   </section>
 </template>
 
 <style scoped>
 .scene {
-  padding: 16px;
+  padding: 12px 16px;
   display: grid;
   gap: 8px;
   justify-items: center;
 }
-.meta,
-.hint {
+.meta {
   color: var(--muted);
   font-size: 14px;
 }
 .enemy {
-  width: min(100%, 360px);
-  padding: 32px 16px;
+  width: min(100%, 420px);
+  padding: 28px 16px;
   display: grid;
   gap: 8px;
-  background: var(--panel);
-  color: inherit;
-  font: inherit;
-  border: 1px solid var(--line);
   border-radius: 8px;
-  cursor: pointer;
   user-select: none;
+  -webkit-user-select: none;
   touch-action: manipulation;
 }
 .enemy:active {
@@ -71,16 +68,9 @@ const view = computed(() => {
 .name {
   font-size: 20px;
 }
-.bar {
+.hp-bar {
   height: 12px;
-  background: var(--line);
   border-radius: 6px;
-  overflow: hidden;
-}
-.fill {
-  display: block;
-  height: 100%;
-  background: var(--blood);
 }
 .hp {
   font-size: 14px;

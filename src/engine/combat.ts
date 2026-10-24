@@ -66,7 +66,9 @@ function kill(state: GameState): void {
   stats.kills++
 
   if (isBoss(c.enemyIndex)) {
-    r.bones = r.bones.add(bonesDrop(c.stage).mul(bonesMult(state)))
+    const bones = bonesDrop(c.stage).mul(bonesMult(state))
+    r.bones = r.bones.add(bones)
+    stats.bonesEarnedTotal = stats.bonesEarnedTotal.add(bones)
     stats.bossKills++
     c.stage++
     c.enemyIndex = 0
