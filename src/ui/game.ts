@@ -1,5 +1,5 @@
 import { markRaw, ref } from 'vue'
-import { createInitialState, createLoop, tick, TICK_SECONDS } from '../engine'
+import { bite, createInitialState, createLoop, tick, TICK_SECONDS } from '../engine'
 
 const UI_REFRESH_MS = 100
 
@@ -22,4 +22,9 @@ export function startGame(): void {
   loop.advance(now())
   setInterval(() => loop.advance(now()), TICK_SECONDS * 1000)
   setInterval(() => frame.value++, UI_REFRESH_MS)
+}
+
+export function playerBite(): void {
+  bite(state)
+  frame.value++
 }
