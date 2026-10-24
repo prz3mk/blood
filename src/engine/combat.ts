@@ -36,6 +36,12 @@ export const critChance = (state: GameState): number => Math.min(1, statBonus(st
 
 export const bloodMult = (state: GameState): number => 1 + statBonus(state, 'bloodMult')
 
+export const bonesMult = (state: GameState): number => 1 + statBonus(state, 'bonesMult')
+
+export const bossDmgMult = (state: GameState): number => 1 + statBonus(state, 'bossDmgMult')
+
+export const autoBitesPerSecond = (state: GameState): number => statBonus(state, 'autoBites')
+
 function spawn(state: GameState): void {
   const c = state.combat
   c.enemyHp = enemyMaxHp(c.stage, isBoss(c.enemyIndex))
@@ -51,7 +57,7 @@ function kill(state: GameState): void {
   stats.kills++
 
   if (isBoss(c.enemyIndex)) {
-    r.bones = r.bones.add(bonesDrop(c.stage))
+    r.bones = r.bones.add(bonesDrop(c.stage).mul(bonesMult(state)))
     stats.bossKills++
     c.stage++
     c.enemyIndex = 0
@@ -62,22 +68,29 @@ function kill(state: GameState): void {
   spawn(state)
 }
 
-/** Apply damage; overkill carries to following enemies. */
+/**
+ * Apply raw damage; overkill carries to following enemies. Boss multiplier
+ * applies only to the part spent on a boss.
+ */
 export function dealDamage(state: GameState, amount: Decimal): void {
   const c = state.combat
   let left = amount
   for (let kills = 0; left.gt(0) && kills < COMBAT.maxKillsPerHit; kills++) {
-    if (left.lt(c.enemyHp)) {
-      c.enemyHp = c.enemyHp.sub(left)
+    const mult = isBoss(c.enemyIndex) ? bossDmgMult(state) : 1
+    const effective = left.mul(mult)
+    if (effective.lt(c.enemyHp)) {
+      c.enemyHp = c.enemyHp.sub(effective)
       return
     }
-    left = left.sub(c.enemyHp)
+    left = effective.sub(c.enemyHp).div(mult)
     kill(state)
   }
 }
 
-export function bite(state: GameState, rng: () => number = Math.random): void {
-  state.stats.clicks++
+/** auto = from Bat Swarm; counted separately from player clicks. */
+export function bite(state: GameState, rng: () => number = Math.random, auto = false): void {
+  if (auto) state.stats.autoBites++
+  else state.stats.clicks++
   let dmg = biteDamage(state)
   if (rng() < critChance(state)) {
     dmg = dmg.mul(CRIT_MULT)

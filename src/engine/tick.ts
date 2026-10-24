@@ -1,4 +1,4 @@
-import { autoDps, dealDamage } from './combat'
+import { autoBitesPerSecond, autoDps, bite, dealDamage } from './combat'
 import type { GameState } from './state'
 import { updateUnlocks } from './upgrades'
 
@@ -10,5 +10,12 @@ export function tick(state: GameState, dt: number): void {
   state.stats.playTime += dt
   const dps = autoDps(state)
   if (dps.gt(0)) dealDamage(state, dps.mul(dt))
+
+  const c = state.combat
+  c.autoBiteProgress += autoBitesPerSecond(state) * dt
+  while (c.autoBiteProgress >= 1 - 1e-9) {
+    c.autoBiteProgress--
+    bite(state, Math.random, true)
+  }
   updateUnlocks(state)
 }

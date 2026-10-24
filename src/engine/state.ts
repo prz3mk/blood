@@ -13,6 +13,8 @@ export interface Combat {
   /** 0..enemiesPerStage-1 = normal enemies, enemiesPerStage = boss. */
   enemyIndex: number
   enemyHp: Decimal
+  /** Fractional auto-bites accumulated (Bat Swarm). */
+  autoBiteProgress: number
 }
 
 export interface Stats {
@@ -25,6 +27,7 @@ export interface Stats {
   bossKills: number
   clicks: number
   crits: number
+  autoBites: number
   maxStage: number
 }
 
@@ -44,7 +47,7 @@ export interface GameState {
 export function createInitialState(): GameState {
   return {
     resources: { blood: D(0), bones: D(0), essence: D(0) },
-    combat: { stage: 1, enemyIndex: 0, enemyHp: D(COMBAT.enemyHpBase) },
+    combat: { stage: 1, enemyIndex: 0, enemyHp: D(COMBAT.enemyHpBase), autoBiteProgress: 0 },
     upgrades: { levels: {}, unlocked: {} },
     stats: {
       playTime: 0,
@@ -54,6 +57,7 @@ export function createInitialState(): GameState {
       bossKills: 0,
       clicks: 0,
       crits: 0,
+      autoBites: 0,
       maxStage: 1,
     },
   }

@@ -11,6 +11,10 @@ export type UpgradeStat =
   | 'dpsMult'
   | 'bloodMult'
   | 'critChance'
+  | 'bossDmgMult'
+  | 'bonesMult'
+  | 'offlineHours'
+  | 'autoBites'
 
 export interface UpgradeDef {
   id: string
@@ -34,6 +38,10 @@ export const UPGRADES: readonly UpgradeDef[] = [
   { id: 'ghoulTraining', name: 'Ghoul Training', currency: 'blood', base: 500, growth: 1.3, stat: 'dpsMult', perLevel: 0.15, desc: '+15% DPS' },
   { id: 'bloodSiphon', name: 'Blood Siphon', currency: 'blood', base: 250, growth: 1.4, stat: 'bloodMult', perLevel: 0.05, desc: '+5% Blood drop' },
   { id: 'criticalBite', name: 'Critical Bite', currency: 'blood', base: 1000, growth: 1.5, max: 25, stat: 'critChance', perLevel: 0.02, desc: `+2% crit chance (×${CRIT_MULT})` },
+  { id: 'boneArmor', name: 'Bone Armor', currency: 'bones', base: 5, growth: 1.5, stat: 'bossDmgMult', perLevel: 0.2, desc: '+20% dmg vs boss' },
+  { id: 'ossuary', name: 'Ossuary', currency: 'bones', base: 10, growth: 1.6, stat: 'bonesMult', perLevel: 0.25, desc: '+25% Bones from boss' },
+  { id: 'nightEndurance', name: 'Night Endurance', currency: 'bones', base: 3, growth: 2, max: 22, stat: 'offlineHours', perLevel: 1, desc: '+1h offline limit' },
+  { id: 'batSwarm', name: 'Bat Swarm', currency: 'bones', base: 25, growth: 1.8, max: 10, stat: 'autoBites', perLevel: 1, desc: '+1 auto-bite/s' },
 ]
 
 /** Upgrade appears once you first hold this fraction of its base cost. */

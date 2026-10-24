@@ -4,6 +4,7 @@ import { autoDps, bite, biteDamage, dealDamage } from './combat'
 import { D } from './decimal'
 import { createInitialState } from './state'
 import { tick } from './tick'
+import { offlineLimitHours } from './offline'
 import { buyCount, buyUpgrade, updateUnlocks, upgradeCost } from './upgrades'
 
 const def = (id: string) => UPGRADES.find((u) => u.id === id)!
@@ -70,5 +71,48 @@ describe('upgrades', () => {
     s.resources.blood = D(0)
     updateUnlocks(s)
     expect(s.upgrades.unlocked.sharpFangs).toBe(true)
+  })
+})
+
+describe('bones upgrades', () => {
+  it('Bone Armor multiplies only boss damage, overkill converts back', () => {
+    const s = createInitialState()
+    s.upgrades.levels = { boneArmor: 5 } // x2 vs boss
+    dealDamage(s, D(100)) // 10 normal enemies
+    dealDamage(s, D(40)) // boss 100hp takes 80
+    expect(s.combat.enemyHp.toNumber()).toBeCloseTo(20)
+    dealDamage(s, D(15)) // 30 effective, 10 to kill, 5 raw left
+    expect(s.combat.stage).toBe(2)
+    expect(s.combat.enemyHp.toNumber()).toBeCloseTo(6.8)
+  })
+
+  it('Ossuary multiplies bones', () => {
+    const s = createInitialState()
+    s.upgrades.levels = { ossuary: 4 }
+    dealDamage(s, D(200))
+    expect(s.resources.bones.toNumber()).toBe(2)
+  })
+
+  it('Night Endurance raises offline limit', () => {
+    const s = createInitialState()
+    expect(offlineLimitHours(s)).toBe(2)
+    s.upgrades.levels = { nightEndurance: 3 }
+    expect(offlineLimitHours(s)).toBe(5)
+  })
+
+  it('Bat Swarm auto-bites per second', () => {
+    const s = createInitialState()
+    s.upgrades.levels = { batSwarm: 2 }
+    for (let i = 0; i < 40; i++) tick(s, 0.05) // 2s
+    expect(s.stats.autoBites).toBe(4)
+    expect(s.stats.clicks).toBe(0)
+    expect(s.combat.enemyHp.toNumber()).toBe(6)
+  })
+
+  it('bones upgrades cost bones', () => {
+    const s = createInitialState()
+    s.resources.bones = D(3)
+    expect(buyUpgrade(s, def('nightEndurance'), 1)).toBe(1)
+    expect(s.resources.bones.toNumber()).toBe(0)
   })
 })

@@ -10,9 +10,18 @@ const modes: { value: BuyMode; label: string }[] = [
   { value: 'max', label: 'Max' },
 ]
 
-const rows = computed(() => {
+const CURRENCIES = ['blood', 'bones'] as const
+
+const groups = computed(() => {
   void frame.value
-  return UPGRADES.filter((def) => state.upgrades.unlocked[def.id]).map((def) => {
+  return CURRENCIES.map((currency) => ({
+    currency,
+    rows: rows(currency),
+  })).filter((g) => g.rows.length)
+})
+
+function rows(currency: (typeof CURRENCIES)[number]) {
+  return UPGRADES.filter((def) => def.currency === currency && state.upgrades.unlocked[def.id]).map((def) => {
     const owned = level(state, def.id)
     const maxed = def.max !== undefined && owned >= def.max
     const n = buyCount(state, def, buyMode.value)
@@ -25,7 +34,7 @@ const rows = computed(() => {
       cost: formatNumber(upgradeCost(def, owned, Math.max(n, 1))),
     }
   })
-})
+}
 </script>
 
 <template>
@@ -40,19 +49,22 @@ const rows = computed(() => {
         {{ m.label }}
       </button>
     </div>
-    <p v-if="!rows.length" class="empty">Collect Blood to discover upgrades.</p>
-    <div v-for="r in rows" :key="r.def.id" class="row">
-      <div class="info">
-        <div>
-          {{ r.def.name }} <span class="lvl">Lv {{ r.owned }}<template v-if="r.def.max"> / {{ r.def.max }}</template></span>
+    <p v-if="!groups.length" class="empty">Collect Blood to discover upgrades.</p>
+    <template v-for="g in groups" :key="g.currency">
+      <h2>{{ g.currency }}</h2>
+      <div v-for="r in g.rows" :key="r.def.id" class="row">
+        <div class="info">
+          <div>
+            {{ r.def.name }} <span class="lvl">Lv {{ r.owned }}<template v-if="r.def.max"> / {{ r.def.max }}</template></span>
+          </div>
+          <div class="desc">{{ r.def.desc }}</div>
         </div>
-        <div class="desc">{{ r.def.desc }}</div>
+        <button class="buy" :disabled="r.maxed || r.n === 0" @click="playerBuy(r.def)">
+          <template v-if="r.maxed">Max</template>
+          <template v-else>+{{ Math.max(r.n, 1) }} · {{ r.cost }} {{ r.def.currency }}</template>
+        </button>
       </div>
-      <button class="buy" :disabled="r.maxed || r.n === 0" @click="playerBuy(r.def)">
-        <template v-if="r.maxed">Max</template>
-        <template v-else>+{{ Math.max(r.n, 1) }} · {{ r.cost }} {{ r.def.currency }}</template>
-      </button>
-    </div>
+    </template>
   </section>
 </template>
 
@@ -76,6 +88,13 @@ button {
 button:disabled {
   opacity: 0.45;
   cursor: default;
+}
+h2 {
+  margin: 8px 0 0;
+  font-size: 13px;
+  font-weight: 500;
+  text-transform: capitalize;
+  color: var(--muted);
 }
 .modes {
   display: flex;
