@@ -1,4 +1,4 @@
-import { autoBitesPerSecond, autoDps, bite, dealDamage } from './combat'
+import { autoBite, autoBitesPerSecond, autoDps, dealDamage } from './combat'
 import type { GameState } from './state'
 import { updateUnlocks } from './upgrades'
 
@@ -13,9 +13,9 @@ export function tick(state: GameState, dt: number): void {
 
   const c = state.combat
   c.autoBiteProgress += autoBitesPerSecond(state) * dt
-  while (c.autoBiteProgress >= 1 - 1e-9) {
-    c.autoBiteProgress--
-    bite(state, Math.random, true)
-  }
+  // Epsilon: float sums land just under whole bites.
+  const n = Math.floor(c.autoBiteProgress + 1e-9)
+  c.autoBiteProgress -= n
+  autoBite(state, n)
   updateUnlocks(state)
 }

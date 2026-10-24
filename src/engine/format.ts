@@ -33,3 +33,13 @@ export function formatNumber(value: DecimalSource, notation: Notation = 'scienti
   const m = x.div(D(10).pow(e)).toNumber()
   return `${trunc(m, 2)}e${e}`
 }
+
+/** 3725 → "1h 2m", 45 → "45s". */
+export function formatDuration(seconds: number): string {
+  const s = Math.floor(seconds)
+  const h = Math.floor(s / 3600)
+  const m = Math.floor((s % 3600) / 60)
+  if (h) return m ? `${h}h ${m}m` : `${h}h`
+  if (m) return s % 60 ? `${m}m ${s % 60}s` : `${m}m`
+  return `${s}s`
+}

@@ -87,14 +87,32 @@ export function dealDamage(state: GameState, amount: Decimal): void {
   }
 }
 
-/** auto = from Bat Swarm; counted separately from player clicks. */
-export function bite(state: GameState, rng: () => number = Math.random, auto = false): void {
-  if (auto) state.stats.autoBites++
-  else state.stats.clicks++
+export function bite(state: GameState, rng: () => number = Math.random): void {
+  state.stats.clicks++
   let dmg = biteDamage(state)
   if (rng() < critChance(state)) {
     dmg = dmg.mul(CRIT_MULT)
     state.stats.crits++
   }
   dealDamage(state, dmg)
+}
+
+/**
+ * n Bat Swarm bites as one hit. A single bite rolls crit; batches (offline
+ * chunks) use expected crit damage to stay cheap.
+ */
+export function autoBite(state: GameState, n: number, rng: () => number = Math.random): void {
+  if (n <= 0) return
+  state.stats.autoBites += n
+  const chance = critChance(state)
+  let mult: number
+  if (n === 1) {
+    const crit = rng() < chance
+    if (crit) state.stats.crits++
+    mult = crit ? CRIT_MULT : 1
+  } else {
+    state.stats.crits += Math.round(n * chance)
+    mult = n * (1 + chance * (CRIT_MULT - 1))
+  }
+  dealDamage(state, biteDamage(state).mul(mult))
 }
