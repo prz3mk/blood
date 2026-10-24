@@ -2,6 +2,7 @@
 import { ref } from 'vue'
 import type { Notation } from '../../engine'
 import { exportGame, frame, hardReset, importGame, state } from '../game'
+import { canInstall, promptInstall } from '../install'
 
 const notations: { value: Notation; label: string }[] = [
   { value: 'scientific', label: 'Scientific (1.50e6)' },
@@ -68,6 +69,14 @@ function doReset() {
       </div>
       <p v-if="message" class="muted msg">{{ message }}</p>
     </div>
+
+    <template v-if="canInstall">
+      <h2 class="section-title">App</h2>
+      <div class="card">
+        <button @click="promptInstall">Install Blood</button>
+        <p class="muted msg">Plays offline, launches from your home screen.</p>
+      </div>
+    </template>
 
     <h2 class="section-title">Danger zone</h2>
     <div class="card">
