@@ -1,10 +1,13 @@
-/** Starting balance assumptions; see design doc "Zasoby i walka". */
+/**
+ * See design doc "Zasoby i walka". Tuned in step 10 with src/balance
+ * (npm run balance): Blood growth > HP growth so pushing stages pays off.
+ */
 export const COMBAT = {
   enemiesPerStage: 10,
   enemyHpBase: 10,
-  enemyHpGrowth: 1.18,
+  enemyHpGrowth: 1.14,
   bloodBase: 1,
-  bloodGrowth: 1.15,
+  bloodGrowth: 1.2,
   bossHpMult: 10,
   /** Bones = bonesBase + floor(stage / bonesEvery) */
   bossBonesBase: 1,

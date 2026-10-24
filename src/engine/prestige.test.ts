@@ -62,7 +62,7 @@ describe('prestige: Sleep in the Coffin', () => {
     s.stats.bloodEarnedRun = D(1e6)
     prestige(s, coffin)
     expect(s.combat.stage).toBe(5)
-    expect(s.combat.enemyHp.toNumber()).toBeCloseTo(10 * 1.18 ** 4)
+    expect(s.combat.enemyHp.toNumber()).toBeCloseTo(10 * 1.14 ** 4)
   })
 })
 
@@ -113,7 +113,7 @@ describe('dev hooks', () => {
     setStage(s, 11)
     expect(s.combat.stage).toBe(11)
     expect(s.combat.enemyIndex).toBe(0)
-    expect(s.combat.enemyHp.toNumber()).toBeCloseTo(10 * 1.18 ** 10)
+    expect(s.combat.enemyHp.toNumber()).toBeCloseTo(10 * 1.14 ** 10)
     expect(s.stats.maxStage).toBe(11)
   })
 })

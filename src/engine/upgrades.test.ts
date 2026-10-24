@@ -40,7 +40,7 @@ describe('upgrades', () => {
     const s = createInitialState()
     s.upgrades.levels = { sharpFangs: 4, bloodlust: 5, ghoulServant: 2, ghoulTraining: 2, bloodSiphon: 2 }
     expect(biteDamage(s).toNumber()).toBeCloseTo(7.5)
-    expect(autoDps(s).toNumber()).toBeCloseTo(2.6)
+    expect(autoDps(s).toNumber()).toBeCloseTo(5.2)
     dealDamage(s, D(10))
     expect(s.resources.blood.toNumber()).toBeCloseTo(1.1)
   })
@@ -57,7 +57,7 @@ describe('upgrades', () => {
 
   it('ghoul DPS kills over time', () => {
     const s = createInitialState()
-    s.upgrades.levels = { ghoulServant: 10 }
+    s.upgrades.levels = { ghoulServant: 5 }
     for (let i = 0; i < 20; i++) tick(s, 0.05)
     expect(s.stats.kills).toBe(1)
   })
@@ -83,7 +83,7 @@ describe('bones upgrades', () => {
     expect(s.combat.enemyHp.toNumber()).toBeCloseTo(20)
     dealDamage(s, D(15)) // 30 effective, 10 to kill, 5 raw left
     expect(s.combat.stage).toBe(2)
-    expect(s.combat.enemyHp.toNumber()).toBeCloseTo(6.8)
+    expect(s.combat.enemyHp.toNumber()).toBeCloseTo(6.4)
   })
 
   it('Ossuary multiplies bones', () => {

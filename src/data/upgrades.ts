@@ -38,7 +38,7 @@ export const CRIT_MULT = 5
 export const UPGRADES: readonly UpgradeDef[] = [
   { id: 'sharpFangs', name: 'Sharp Fangs', currency: 'blood', base: 10, growth: 1.15, stat: 'biteFlat', perLevel: 1, desc: '+1 Bite dmg' },
   { id: 'bloodlust', name: 'Bloodlust', currency: 'blood', base: 100, growth: 1.25, stat: 'biteMult', perLevel: 0.1, desc: '+10% Bite dmg' },
-  { id: 'ghoulServant', automation: true, name: 'Ghoul Servant', currency: 'blood', base: 50, growth: 1.15, stat: 'dpsFlat', perLevel: 1, desc: '+1 DPS' },
+  { id: 'ghoulServant', automation: true, name: 'Ghoul Servant', currency: 'blood', base: 50, growth: 1.15, stat: 'dpsFlat', perLevel: 2, desc: '+2 DPS' },
   { id: 'ghoulTraining', automation: true, name: 'Ghoul Training', currency: 'blood', base: 500, growth: 1.3, stat: 'dpsMult', perLevel: 0.15, desc: '+15% DPS' },
   { id: 'bloodSiphon', name: 'Blood Siphon', currency: 'blood', base: 250, growth: 1.4, stat: 'bloodMult', perLevel: 0.05, desc: '+5% Blood drop' },
   { id: 'criticalBite', name: 'Critical Bite', currency: 'blood', base: 1000, growth: 1.5, max: 25, stat: 'critChance', perLevel: 0.02, desc: `+2% crit chance (×${CRIT_MULT})` },

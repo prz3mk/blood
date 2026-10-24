@@ -7,13 +7,13 @@ import { createInitialState } from './state'
 describe('formulas', () => {
   it('enemy HP', () => {
     expect(enemyMaxHp(1, false).toNumber()).toBe(10)
-    expect(enemyMaxHp(2, false).toNumber()).toBeCloseTo(11.8)
+    expect(enemyMaxHp(2, false).toNumber()).toBeCloseTo(11.4)
     expect(enemyMaxHp(1, true).toNumber()).toBe(100)
   })
 
   it('drops', () => {
     expect(bloodDrop(1).toNumber()).toBe(1)
-    expect(bloodDrop(3).toNumber()).toBeCloseTo(1.3225)
+    expect(bloodDrop(3).toNumber()).toBeCloseTo(1.44)
     expect(bonesDrop(1).toNumber()).toBe(1)
     expect(bonesDrop(5).toNumber()).toBe(2)
     expect(bonesDrop(12).toNumber()).toBe(3)
