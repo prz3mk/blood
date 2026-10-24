@@ -1,4 +1,5 @@
 import { COMBAT, ZONES } from '../data/combat'
+import { ESSENCE_DAMAGE_PER } from '../data/prestige'
 import { CRIT_MULT } from '../data/upgrades'
 import { D, type Decimal } from './decimal'
 import type { GameState } from './state'
@@ -26,11 +27,19 @@ export function enemyName(state: GameState): string {
   return zone.enemies[(stage + enemyIndex) % zone.enemies.length]
 }
 
+/** Applies to all damage. */
+export const essenceDamageMult = (state: GameState): Decimal =>
+  state.resources.essence.mul(ESSENCE_DAMAGE_PER).add(1)
+
 export const biteDamage = (state: GameState): Decimal =>
-  D(COMBAT.baseBiteDamage + statBonus(state, 'biteFlat')).mul(1 + statBonus(state, 'biteMult'))
+  D(COMBAT.baseBiteDamage + statBonus(state, 'biteFlat'))
+    .mul(1 + statBonus(state, 'biteMult'))
+    .mul(essenceDamageMult(state))
 
 export const autoDps = (state: GameState): Decimal =>
-  D(statBonus(state, 'dpsFlat')).mul(1 + statBonus(state, 'dpsMult'))
+  D(statBonus(state, 'dpsFlat'))
+    .mul(1 + statBonus(state, 'dpsMult'))
+    .mul(essenceDamageMult(state))
 
 export const critChance = (state: GameState): number => Math.min(1, statBonus(state, 'critChance'))
 
@@ -42,7 +51,7 @@ export const bossDmgMult = (state: GameState): number => 1 + statBonus(state, 'b
 
 export const autoBitesPerSecond = (state: GameState): number => statBonus(state, 'autoBites')
 
-function spawn(state: GameState): void {
+export function spawn(state: GameState): void {
   const c = state.combat
   c.enemyHp = enemyMaxHp(c.stage, isBoss(c.enemyIndex))
 }

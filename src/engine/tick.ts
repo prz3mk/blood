@@ -1,6 +1,6 @@
 import { autoBite, autoBitesPerSecond, autoDps, dealDamage } from './combat'
 import type { GameState } from './state'
-import { updateUnlocks } from './upgrades'
+import { autoBuyBlood, updateUnlocks } from './upgrades'
 
 export const TICKS_PER_SECOND = 20
 export const TICK_SECONDS = 1 / TICKS_PER_SECOND
@@ -18,4 +18,5 @@ export function tick(state: GameState, dt: number): void {
   c.autoBiteProgress -= n
   autoBite(state, n)
   updateUnlocks(state)
+  autoBuyBlood(state)
 }

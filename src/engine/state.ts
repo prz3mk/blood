@@ -29,6 +29,13 @@ export interface Stats {
   crits: number
   autoBites: number
   maxStage: number
+  /** Times each prestige layer was done, by layer id. */
+  prestiges: Record<string, number>
+}
+
+/** Survive every prestige. */
+export interface Settings {
+  autoBuyBlood: boolean
 }
 
 export interface Upgrades {
@@ -42,6 +49,7 @@ export interface GameState {
   combat: Combat
   upgrades: Upgrades
   stats: Stats
+  settings: Settings
 }
 
 export function createInitialState(): GameState {
@@ -59,6 +67,8 @@ export function createInitialState(): GameState {
       crits: 0,
       autoBites: 0,
       maxStage: 1,
+      prestiges: {},
     },
+    settings: { autoBuyBlood: true },
   }
 }

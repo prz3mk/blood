@@ -15,6 +15,8 @@ export type UpgradeStat =
   | 'bonesMult'
   | 'offlineHours'
   | 'autoBites'
+  | 'startStage'
+  | 'autoBuyBlood'
 
 export interface UpgradeDef {
   id: string
@@ -42,6 +44,9 @@ export const UPGRADES: readonly UpgradeDef[] = [
   { id: 'ossuary', name: 'Ossuary', currency: 'bones', base: 10, growth: 1.6, stat: 'bonesMult', perLevel: 0.25, desc: '+25% Bones from boss' },
   { id: 'nightEndurance', name: 'Night Endurance', currency: 'bones', base: 3, growth: 2, max: 22, stat: 'offlineHours', perLevel: 1, desc: '+1h offline limit' },
   { id: 'batSwarm', name: 'Bat Swarm', currency: 'bones', base: 25, growth: 1.8, max: 10, stat: 'autoBites', perLevel: 1, desc: '+1 auto-bite/s' },
+  { id: 'headStart', name: 'Head Start', currency: 'essence', base: 3, growth: 1, max: 1, stat: 'startStage', perLevel: 4, desc: 'Start each run at stage 5' },
+  { id: 'deepSleep', name: 'Deep Sleep', currency: 'essence', base: 2, growth: 1, max: 1, stat: 'offlineHours', perLevel: 1, desc: '+1h offline limit' },
+  { id: 'bloodThrall', name: 'Blood Thrall', currency: 'essence', base: 5, growth: 1, max: 1, stat: 'autoBuyBlood', perLevel: 1, desc: 'Auto-buys Blood upgrades' },
 ]
 
 /** Upgrade appears once you first hold this fraction of its base cost. */

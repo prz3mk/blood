@@ -10,7 +10,8 @@ const modes: { value: BuyMode; label: string }[] = [
   { value: 'max', label: 'Max' },
 ]
 
-const CURRENCIES = ['blood', 'bones'] as const
+const CURRENCIES = ['blood', 'bones', 'essence'] as const
+const LABELS = { blood: 'Blood', bones: 'Bones', essence: 'Essence shop' }
 
 const groups = computed(() => {
   void frame.value
@@ -51,7 +52,7 @@ function rows(currency: (typeof CURRENCIES)[number]) {
     </div>
     <p v-if="!groups.length" class="empty">Collect Blood to discover upgrades.</p>
     <template v-for="g in groups" :key="g.currency">
-      <h2>{{ g.currency }}</h2>
+      <h2>{{ LABELS[g.currency] }}</h2>
       <div v-for="r in g.rows" :key="r.def.id" class="row">
         <div class="info">
           <div>
@@ -93,7 +94,6 @@ h2 {
   margin: 8px 0 0;
   font-size: 13px;
   font-weight: 500;
-  text-transform: capitalize;
   color: var(--muted);
 }
 .modes {

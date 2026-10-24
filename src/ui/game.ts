@@ -1,11 +1,13 @@
 import { markRaw, ref, shallowRef } from 'vue'
 import { AUTOSAVE_SECONDS, OFFLINE } from '../data/offline'
+import type { PrestigeLayer } from '../data/prestige'
 import type { UpgradeDef } from '../data/upgrades'
 import {
   bite,
   buyUpgrade,
   createInitialState,
   createLoop,
+  prestige,
   simulateOffline,
   tick,
   TICK_SECONDS,
@@ -85,4 +87,12 @@ export function importGame(text: string): void {
   replaceState(importSave(text).state)
   loop.reset()
   save()
+}
+
+export function playerPrestige(layer: PrestigeLayer): void {
+  if (prestige(state, layer).gt(0)) {
+    loop.reset()
+    save()
+    frame.value++
+  }
 }
