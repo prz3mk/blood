@@ -41,6 +41,7 @@ const r = computed(() => {
 .backdrop {
   position: fixed;
   inset: 0;
+  z-index: 20;
   background: rgb(0 0 0 / 0.7);
   display: grid;
   place-items: center;

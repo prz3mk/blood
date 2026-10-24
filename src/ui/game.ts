@@ -10,6 +10,7 @@ import {
   D,
   formatNumber,
   prestige,
+  setStage,
   simulateOffline,
   tick,
   TICK_SECONDS,
@@ -70,8 +71,11 @@ function runOffline(seconds: number): void {
   frame.value++
 }
 
+/** Dev-only game speed multiplier. */
+export const timeScale = ref(1)
+
 const loop = createLoop({
-  step: (dt) => tick(state, dt),
+  step: (dt) => tick(state, dt * timeScale.value),
   maxCatchUp: MAX_CATCH_UP,
   onGap: runOffline,
 })
@@ -136,4 +140,27 @@ export function hardReset(): void {
   replaceState(createInitialState())
   loop.reset()
   save()
+}
+
+// --- Dev tools (DevPanel is only bundled in dev builds) ---
+
+export function devAdd(resource: keyof GameState['resources'], amount: DecimalSource): void {
+  state.resources[resource] = state.resources[resource].add(amount)
+  // Count Blood as earned so prestige progress follows.
+  if (resource === 'blood') state.stats.bloodEarnedRun = state.stats.bloodEarnedRun.add(amount)
+  frame.value++
+}
+
+export function devSetStage(stage: number): void {
+  setStage(state, stage)
+  frame.value++
+}
+
+export const devOffline = (hours: number): void => runOffline(hours * 3600)
+
+export function devForcePrestige(layer: PrestigeLayer): void {
+  prestige(state, layer, true)
+  loop.reset()
+  save()
+  frame.value++
 }

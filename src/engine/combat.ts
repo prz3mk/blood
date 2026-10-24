@@ -79,6 +79,15 @@ function kill(state: GameState): void {
   spawn(state)
 }
 
+/** Jump to the first enemy of a stage (dev tool). */
+export function setStage(state: GameState, stage: number): void {
+  const c = state.combat
+  c.stage = Math.max(1, Math.floor(stage))
+  c.enemyIndex = 0
+  state.stats.maxStage = Math.max(state.stats.maxStage, c.stage)
+  spawn(state)
+}
+
 /**
  * Apply raw damage; overkill carries to following enemies. Boss multiplier
  * applies only to the part spent on a boss.

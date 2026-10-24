@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { PRESTIGE_LAYERS } from '../data/prestige'
 import { UPGRADES } from '../data/upgrades'
-import { biteDamage } from './combat'
+import { biteDamage, setStage } from './combat'
 import { D } from './decimal'
 import { offlineLimitHours } from './offline'
 import { canPrestige, prestige, prestigeReward } from './prestige'
@@ -94,5 +94,26 @@ describe('essence', () => {
     // Fangs stay cheaper than Ghoul (50): 10+11.5+13.2+15.2+17.5 = 67.4, next 20.1 > 12.6 left
     expect(s.upgrades.levels.sharpFangs).toBe(5)
     expect(s.upgrades.levels.ghoulServant).toBeUndefined()
+  })
+})
+
+describe('dev hooks', () => {
+  it('force prestige resets below threshold with 0 reward', () => {
+    const s = createInitialState()
+    s.resources.blood = D(50)
+    s.combat.stage = 9
+    expect(prestige(s, coffin, true).toNumber()).toBe(0)
+    expect(s.resources.blood.toNumber()).toBe(0)
+    expect(s.combat.stage).toBe(1)
+    expect(s.stats.prestiges.coffin).toBe(1)
+  })
+
+  it('setStage jumps with correct HP and records max', () => {
+    const s = createInitialState()
+    setStage(s, 11)
+    expect(s.combat.stage).toBe(11)
+    expect(s.combat.enemyIndex).toBe(0)
+    expect(s.combat.enemyHp.toNumber()).toBeCloseTo(10 * 1.18 ** 10)
+    expect(s.stats.maxStage).toBe(11)
   })
 })

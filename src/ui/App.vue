@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { defineAsyncComponent } from 'vue'
 import CombatScene from './CombatScene.vue'
 import { activeTab, startGame } from './game'
 import OfflineModal from './OfflineModal.vue'
@@ -11,6 +12,9 @@ import SettingsTab from './tabs/SettingsTab.vue'
 import UpgradesTab from './tabs/UpgradesTab.vue'
 
 startGame()
+
+// Dev-only; the import is dropped from production builds.
+const DevPanel = import.meta.env.DEV ? defineAsyncComponent(() => import('./DevPanel.vue')) : null
 
 const panels = {
   combat: CombatTab,
@@ -35,6 +39,7 @@ const panels = {
     </div>
   </div>
   <OfflineModal />
+  <DevPanel v-if="DevPanel" />
 </template>
 
 <style scoped>

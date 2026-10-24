@@ -16,10 +16,13 @@ export function prestigeReward(state: GameState, layer: PrestigeLayer): Decimal 
 export const canPrestige = (state: GameState, layer: PrestigeLayer): boolean =>
   prestigeReward(state, layer).gte(1)
 
-/** Returns reward gained (0 = not allowed, nothing changed). */
-export function prestige(state: GameState, layer: PrestigeLayer): Decimal {
+/**
+ * Returns reward gained (0 = not allowed, nothing changed).
+ * force: reset even below threshold (dev tool); reward may be 0.
+ */
+export function prestige(state: GameState, layer: PrestigeLayer, force = false): Decimal {
   const reward = prestigeReward(state, layer)
-  if (reward.lt(1)) return D(0)
+  if (reward.lt(1) && !force) return D(0)
 
   const fresh = createInitialState()
   for (const key of Object.keys(RESOURCE_TIER) as (keyof Resources)[]) {
