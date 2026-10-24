@@ -14,18 +14,18 @@ interface Floater {
 }
 
 const MAX = 12
-/** Ghoul DPS ticks 20×/s; show it as one number per second. */
-const GHOUL_FLUSH_MS = 1000
+/** DPS sources tick 20×/s; show each as one number per second. */
+const FLUSH_MS = 1000
 
 const floaters = ref<Floater[]>([])
 let nextId = 0
-let ghoulSum: Decimal | null = null
+const sums: Partial<Record<HitSource, Decimal>> = {}
 
 function add(source: HitSource, amount: Decimal, crit: boolean) {
   if (!state.settings.damageNumbers) return
   const x = 15 + Math.random() * 70
   // Ghouls below, bites above the name: sources don't collide.
-  const y = source === 'ghoul' ? 45 + Math.random() * 10 : 4 + Math.random() * 18
+  const y = source === 'ghoul' || source === 'wraith' ? 45 + Math.random() * 10 : 4 + Math.random() * 18
   const text = (crit ? 'CRIT ' : '') + fmt(amount)
   floaters.value = [...floaters.value.slice(-(MAX - 1)), { id: nextId++, text, source, crit, x, y }]
 }
@@ -35,14 +35,17 @@ const remove = (id: number) => {
 }
 
 const off = onHit((hit: Hit) => {
-  if (hit.source === 'ghoul') ghoulSum = ghoulSum ? ghoulSum.add(hit.amount) : hit.amount
-  else add(hit.source, hit.amount, hit.crit)
+  if (hit.source === 'ghoul' || hit.source === 'wraith') {
+    sums[hit.source] = sums[hit.source]?.add(hit.amount) ?? hit.amount
+  } else add(hit.source, hit.amount, hit.crit)
 })
 
 const timer = setInterval(() => {
-  if (ghoulSum?.gt(0)) add('ghoul', ghoulSum, false)
-  ghoulSum = null
-}, GHOUL_FLUSH_MS)
+  for (const source of ['ghoul', 'wraith'] as const) {
+    if (sums[source]?.gt(0)) add(source, sums[source], false)
+    delete sums[source]
+  }
+}, FLUSH_MS)
 
 onBeforeUnmount(() => {
   off()
@@ -92,6 +95,10 @@ onBeforeUnmount(() => {
 }
 .ghoul {
   color: #8fcf9a;
+  font-size: 13px;
+}
+.wraith {
+  color: #9fd3ff;
   font-size: 13px;
 }
 .crit {

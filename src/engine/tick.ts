@@ -1,4 +1,4 @@
-import { autoBite, autoBitesPerSecond, autoDps, ghoulAttack } from './combat'
+import { autoBite, autoBitesPerSecond, autoDps, ghoulAttack, wraithAttack, wraithDps } from './combat'
 import type { GameState } from './state'
 import { autoBuyBlood, updateUnlocks } from './upgrades'
 
@@ -10,6 +10,8 @@ export function tick(state: GameState, dt: number): void {
   state.stats.playTime += dt
   const dps = autoDps(state)
   if (dps.gt(0)) ghoulAttack(state, dps.mul(dt))
+  const wraith = wraithDps(state)
+  if (wraith.gt(0)) wraithAttack(state, wraith.mul(dt))
 
   const c = state.combat
   c.autoBiteProgress += autoBitesPerSecond(state) * dt

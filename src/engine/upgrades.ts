@@ -24,6 +24,15 @@ export function statBonus(state: GameState, stat: UpgradeStat): number {
   return total
 }
 
+/** Product over upgrades of (1 + perLevel) ^ level for a stat (compounding). */
+export function statCompound(state: GameState, stat: UpgradeStat): Decimal {
+  let total = D(1)
+  for (const def of UPGRADES) {
+    if (def.stat === stat) total = total.mul(D(1 + def.perLevel).pow(level(state, def.id)))
+  }
+  return total
+}
+
 /** How many to buy for a mode; 0 if none affordable. */
 export function buyCount(state: GameState, def: UpgradeDef, mode: BuyMode): number {
   const owned = level(state, def.id)

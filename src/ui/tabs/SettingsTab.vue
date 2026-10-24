@@ -65,7 +65,7 @@ function doReset() {
       <input v-model="state.settings.damageNumbers" type="checkbox" @change="frame++" />
       Damage numbers
       <span class="muted legend">
-        <span class="k tap">tap</span> · <span class="k bat">bat</span> · <span class="k ghoul">ghoul/s</span> ·
+        <span class="k tap">tap</span> · <span class="k bat">bat</span> · <span class="k ghoul">ghoul/s</span> · <span class="k wraith">wraith/s</span> ·
         <span class="k crit">CRIT</span>
       </span>
     </label>
@@ -127,6 +127,9 @@ textarea {
 }
 .k.ghoul {
   color: #8fcf9a;
+}
+.k.wraith {
+  color: #9fd3ff;
 }
 .k.crit {
   color: #ff4d6a;

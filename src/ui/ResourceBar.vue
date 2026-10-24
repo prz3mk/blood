@@ -1,5 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
+import { ZONES } from '../data/combat'
+import { zoneUnlocked } from '../engine'
 import { fmt, frame, rates, state } from './game'
 
 const items = computed(() => {
@@ -9,6 +11,10 @@ const items = computed(() => {
     { name: 'Blood', value: fmt(r.blood), rate: rates.value.blood },
     { name: 'Bones', value: fmt(r.bones), rate: rates.value.bones },
     { name: 'Essence', value: fmt(r.essence), rate: null },
+    // Souls appear once the Graveyard opens (or while any are held).
+    ...(r.souls.gt(0) || zoneUnlocked(state, ZONES[1])
+      ? [{ name: 'Souls', value: fmt(r.souls), rate: rates.value.souls }]
+      : []),
   ].map((i) => ({ ...i, rate: i.rate && i.rate.gt(0) ? `+${fmt(i.rate)}/s` : '' }))
 })
 </script>
@@ -26,7 +32,8 @@ const items = computed(() => {
 <style scoped>
 .resources {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-auto-columns: 1fr;
+  grid-auto-flow: column;
   gap: 8px;
   padding: 8px 16px;
   border-bottom: 1px solid var(--line);

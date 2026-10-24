@@ -8,6 +8,7 @@ export const RESOURCE_TIER: Record<keyof Resources, number> = {
   blood: 0,
   bones: 0,
   essence: 1,
+  souls: 0,
 }
 
 export interface PrestigeLayer {

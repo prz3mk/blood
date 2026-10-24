@@ -10,6 +10,7 @@ import {
   D,
   formatNumber,
   goToStage,
+  goToZone,
   setHitListener,
   prestige,
   setStage,
@@ -43,13 +44,15 @@ export const activeTab = ref<Tab>('upgrades')
 export const fmt = (x: DecimalSource): string => formatNumber(x, state.settings.notation)
 
 // Income per second from lifetime-earned counters (spending doesn't skew it).
-type Sample = { t: number; blood: Decimal; bones: Decimal }
+type Sample = { t: number; blood: Decimal; bones: Decimal; souls: Decimal }
 let samples: Sample[] = []
-export const rates = shallowRef({ blood: D(0), bones: D(0) })
+const zeroRates = () => ({ blood: D(0), bones: D(0), souls: D(0) })
+export const rates = shallowRef(zeroRates())
 
 function sampleRates(): void {
   const t = performance.now() / 1000
-  samples.push({ t, blood: state.stats.bloodEarnedTotal, bones: state.stats.bonesEarnedTotal })
+  const s = state.stats
+  samples.push({ t, blood: s.bloodEarnedTotal, bones: s.bonesEarnedTotal, souls: s.soulsEarnedTotal })
   while (samples.length > 1 && t - samples[0].t > RATE_WINDOW_S) samples.shift()
   const first = samples[0]
   const dt = t - first.t
@@ -57,13 +60,14 @@ function sampleRates(): void {
   rates.value = {
     blood: state.stats.bloodEarnedTotal.sub(first.blood).div(dt),
     bones: state.stats.bonesEarnedTotal.sub(first.bones).div(dt),
+    souls: state.stats.soulsEarnedTotal.sub(first.souls).div(dt),
   }
 }
 
 function replaceState(next: GameState): void {
   Object.assign(state, next)
   samples = []
-  rates.value = { blood: D(0), bones: D(0) }
+  rates.value = zeroRates()
   frame.value++
 }
 
@@ -131,6 +135,10 @@ export function playerBite(): void {
 export function playerGoToStage(stage: number): void {
   goToStage(state, stage)
   frame.value++
+}
+
+export function playerGoToZone(zoneId: string): void {
+  if (goToZone(state, zoneId)) frame.value++
 }
 
 export function toggleAutoAdvance(): void {
