@@ -10,6 +10,7 @@ import {
   D,
   formatNumber,
   goToStage,
+  setHitListener,
   prestige,
   setStage,
   simulateOffline,
@@ -19,6 +20,7 @@ import {
   type Decimal,
   type DecimalSource,
   type GameState,
+  type Hit,
   type OfflineReport,
 } from '../engine'
 import { clearLocal, exportSave, importSave, loadLocal, saveLocal } from '../save'
@@ -65,8 +67,21 @@ function replaceState(next: GameState): void {
   frame.value++
 }
 
+// Damage-number subscribers. Offline simulation runs muted.
+type HitFn = (hit: Hit) => void
+const hitSubs = new Set<HitFn>()
+const broadcastHit: HitFn = (hit) => hitSubs.forEach((fn) => fn(hit))
+setHitListener(broadcastHit)
+
+export function onHit(fn: HitFn): () => void {
+  hitSubs.add(fn)
+  return () => hitSubs.delete(fn)
+}
+
 function runOffline(seconds: number): void {
+  setHitListener(null)
   const report = simulateOffline(state, seconds)
+  setHitListener(broadcastHit)
   if (report.away >= OFFLINE.reportMinSeconds) offlineReport.value = report
   samples = []
   frame.value++

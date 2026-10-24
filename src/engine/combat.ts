@@ -20,6 +20,15 @@ export function bonesDrop(stage: number): Decimal {
   return D(COMBAT.bossBonesBase + Math.floor(stage / COMBAT.bossBonesEvery))
 }
 
+/** What the current enemy drops on death (with multipliers). */
+export function currentDrops(state: GameState): { blood: Decimal; bones: Decimal } {
+  const { stage, enemyIndex } = state.combat
+  return {
+    blood: bloodDrop(stage).mul(bloodMult(state)),
+    bones: isBoss(enemyIndex) ? bonesDrop(stage).mul(bonesMult(state)) : D(0),
+  }
+}
+
 export function enemyName(state: GameState): string {
   const zone = ZONES[0]
   const { stage, enemyIndex } = state.combat
@@ -50,6 +59,28 @@ export const bonesMult = (state: GameState): number => 1 + statBonus(state, 'bon
 export const bossDmgMult = (state: GameState): number => 1 + statBonus(state, 'bossDmgMult')
 
 export const autoBitesPerSecond = (state: GameState): number => statBonus(state, 'autoBites')
+
+export type HitSource = 'tap' | 'bat' | 'ghoul'
+
+/** Damage as it lands on the current enemy (boss multiplier included). */
+export interface Hit {
+  source: HitSource
+  amount: Decimal
+  crit: boolean
+}
+
+// UI hook for damage numbers; null (e.g. during offline sim) = no events.
+let hitListener: ((hit: Hit) => void) | null = null
+
+export function setHitListener(fn: ((hit: Hit) => void) | null): void {
+  hitListener = fn
+}
+
+function emitHit(state: GameState, source: HitSource, raw: Decimal, crit: boolean): void {
+  if (!hitListener) return
+  const mult = isBoss(state.combat.enemyIndex) ? bossDmgMult(state) : 1
+  hitListener({ source, amount: raw.mul(mult), crit })
+}
 
 export function spawn(state: GameState): void {
   const c = state.combat
@@ -118,10 +149,18 @@ export function dealDamage(state: GameState, amount: Decimal): void {
 export function bite(state: GameState, rng: () => number = Math.random): void {
   state.stats.clicks++
   let dmg = biteDamage(state)
-  if (rng() < critChance(state)) {
+  const crit = rng() < critChance(state)
+  if (crit) {
     dmg = dmg.mul(CRIT_MULT)
     state.stats.crits++
   }
+  emitHit(state, 'tap', dmg, crit)
+  dealDamage(state, dmg)
+}
+
+/** Ghoul DPS for one tick. */
+export function ghoulAttack(state: GameState, dmg: Decimal): void {
+  emitHit(state, 'ghoul', dmg, false)
   dealDamage(state, dmg)
 }
 
@@ -134,13 +173,16 @@ export function autoBite(state: GameState, n: number, rng: () => number = Math.r
   state.stats.autoBites += n
   const chance = critChance(state)
   let mult: number
+  let crit = false
   if (n === 1) {
-    const crit = rng() < chance
+    crit = rng() < chance
     if (crit) state.stats.crits++
     mult = crit ? CRIT_MULT : 1
   } else {
     state.stats.crits += Math.round(n * chance)
     mult = n * (1 + chance * (CRIT_MULT - 1))
   }
-  dealDamage(state, biteDamage(state).mul(mult))
+  const dmg = biteDamage(state).mul(mult)
+  emitHit(state, 'bat', dmg, crit)
+  dealDamage(state, dmg)
 }

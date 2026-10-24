@@ -60,6 +60,16 @@ function doReset() {
       </label>
     </div>
 
+    <h2 class="section-title">Display</h2>
+    <label class="card radio">
+      <input v-model="state.settings.damageNumbers" type="checkbox" @change="frame++" />
+      Damage numbers
+      <span class="muted legend">
+        <span class="k tap">tap</span> · <span class="k bat">bat</span> · <span class="k ghoul">ghoul/s</span> ·
+        <span class="k crit">CRIT</span>
+      </span>
+    </label>
+
     <h2 class="section-title">Save</h2>
     <div class="card">
       <textarea v-model="text" rows="3" placeholder="Paste a save string to import" spellcheck="false" />
@@ -105,6 +115,21 @@ textarea {
 .actions {
   display: flex;
   gap: 8px;
+}
+.legend {
+  margin-left: auto;
+}
+.k.tap {
+  color: var(--text);
+}
+.k.bat {
+  color: #c4a3ff;
+}
+.k.ghoul {
+  color: #8fcf9a;
+}
+.k.crit {
+  color: #ff4d6a;
 }
 .msg {
   margin: 0;
