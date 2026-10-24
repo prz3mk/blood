@@ -11,6 +11,8 @@ export interface Resources {
 export interface Combat {
   /** Stage number, from 1. */
   stage: number
+  /** Highest stage unlocked this run (boss of the one below beaten). */
+  highestStage: number
   /** 0..enemiesPerStage-1 = normal enemies, enemiesPerStage = boss. */
   enemyIndex: number
   enemyHp: Decimal
@@ -38,6 +40,8 @@ export interface Stats {
 /** Survive every prestige. */
 export interface Settings {
   autoBuyBlood: boolean
+  /** true: next stage after boss; false: farm (repeat current stage). */
+  autoAdvance: boolean
   notation: Notation
 }
 
@@ -58,7 +62,7 @@ export interface GameState {
 export function createInitialState(): GameState {
   return {
     resources: { blood: D(0), bones: D(0), essence: D(0) },
-    combat: { stage: 1, enemyIndex: 0, enemyHp: D(COMBAT.enemyHpBase), autoBiteProgress: 0 },
+    combat: { stage: 1, highestStage: 1, enemyIndex: 0, enemyHp: D(COMBAT.enemyHpBase), autoBiteProgress: 0 },
     upgrades: { levels: {}, unlocked: {} },
     stats: {
       playTime: 0,
@@ -73,6 +77,6 @@ export function createInitialState(): GameState {
       maxStage: 1,
       prestiges: {},
     },
-    settings: { autoBuyBlood: true, notation: 'scientific' },
+    settings: { autoBuyBlood: true, autoAdvance: true, notation: 'scientific' },
   }
 }

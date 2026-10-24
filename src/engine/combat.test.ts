@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { COMBAT } from '../data/combat'
-import { bite, bloodDrop, bonesDrop, dealDamage, enemyMaxHp } from './combat'
+import { bite, bloodDrop, bonesDrop, dealDamage, enemyMaxHp, goToStage } from './combat'
 import { D } from './decimal'
 import { createInitialState } from './state'
 
@@ -57,5 +57,39 @@ describe('combat', () => {
     const s = createInitialState()
     dealDamage(s, D('1e100'))
     expect(s.stats.kills).toBe(COMBAT.maxKillsPerHit)
+  })
+})
+
+describe('stage travel', () => {
+  it('farm mode repeats stage after boss but unlocks the next', () => {
+    const s = createInitialState()
+    s.settings.autoAdvance = false
+    dealDamage(s, D(200)) // 10 enemies + boss
+    expect(s.combat.stage).toBe(1)
+    expect(s.combat.enemyIndex).toBe(0)
+    expect(s.combat.highestStage).toBe(2)
+    expect(s.resources.bones.toNumber()).toBe(1)
+  })
+
+  it('auto-advance moves on and unlocks', () => {
+    const s = createInitialState()
+    dealDamage(s, D(200))
+    expect(s.combat.stage).toBe(2)
+    expect(s.combat.highestStage).toBe(2)
+  })
+
+  it('goToStage clamps to 1..highestStage and restarts at enemy 1', () => {
+    const s = createInitialState()
+    s.combat.highestStage = 5
+    s.combat.stage = 5
+    s.combat.enemyIndex = 7
+    goToStage(s, 3)
+    expect(s.combat.stage).toBe(3)
+    expect(s.combat.enemyIndex).toBe(0)
+    expect(s.combat.enemyHp.toNumber()).toBeCloseTo(enemyMaxHp(3, false).toNumber())
+    goToStage(s, 99)
+    expect(s.combat.stage).toBe(5)
+    goToStage(s, 0)
+    expect(s.combat.stage).toBe(1)
   })
 })

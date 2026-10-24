@@ -9,6 +9,7 @@ import {
   createLoop,
   D,
   formatNumber,
+  goToStage,
   prestige,
   setStage,
   simulateOffline,
@@ -109,6 +110,16 @@ export function startGame(): void {
 
 export function playerBite(): void {
   bite(state)
+  frame.value++
+}
+
+export function playerGoToStage(stage: number): void {
+  goToStage(state, stage)
+  frame.value++
+}
+
+export function toggleAutoAdvance(): void {
+  state.settings.autoAdvance = !state.settings.autoAdvance
   frame.value++
 }
 

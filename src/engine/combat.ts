@@ -70,22 +70,30 @@ function kill(state: GameState): void {
     r.bones = r.bones.add(bones)
     stats.bonesEarnedTotal = stats.bonesEarnedTotal.add(bones)
     stats.bossKills++
-    c.stage++
+    c.highestStage = Math.max(c.highestStage, c.stage + 1)
+    stats.maxStage = Math.max(stats.maxStage, c.highestStage)
+    if (state.settings.autoAdvance) c.stage++
     c.enemyIndex = 0
-    stats.maxStage = Math.max(stats.maxStage, c.stage)
   } else {
     c.enemyIndex++
   }
   spawn(state)
 }
 
-/** Jump to the first enemy of a stage (dev tool). */
+/** Player travel: first enemy of any unlocked stage (1..highestStage). */
+export function goToStage(state: GameState, stage: number): void {
+  const c = state.combat
+  c.stage = Math.min(c.highestStage, Math.max(1, Math.floor(stage)))
+  c.enemyIndex = 0
+  spawn(state)
+}
+
+/** Dev tool: jump anywhere, unlocking it. */
 export function setStage(state: GameState, stage: number): void {
   const c = state.combat
-  c.stage = Math.max(1, Math.floor(stage))
-  c.enemyIndex = 0
-  state.stats.maxStage = Math.max(state.stats.maxStage, c.stage)
-  spawn(state)
+  c.highestStage = Math.max(c.highestStage, Math.floor(stage))
+  state.stats.maxStage = Math.max(state.stats.maxStage, c.highestStage)
+  goToStage(state, stage)
 }
 
 /**

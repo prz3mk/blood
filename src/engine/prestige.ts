@@ -36,7 +36,8 @@ export function prestige(state: GameState, layer: PrestigeLayer, force = false):
   state.stats.prestiges[layer.id] = (state.stats.prestiges[layer.id] ?? 0) + 1
 
   // Stage last: start stage may come from kept upgrades.
-  state.combat = { ...fresh.combat, stage: startStage(state) }
+  const start = startStage(state)
+  state.combat = { ...fresh.combat, stage: start, highestStage: start }
   spawn(state)
   return reward
 }

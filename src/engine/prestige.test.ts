@@ -29,6 +29,7 @@ describe('prestige: Sleep in the Coffin', () => {
     s.upgrades.levels = { sharpFangs: 10, boneArmor: 3, deepSleep: 1 }
     s.upgrades.unlocked = { sharpFangs: true }
     s.combat.stage = 40
+    s.combat.highestStage = 40
     s.stats.maxStage = 40
     s.stats.kills = 400
     s.stats.bloodEarnedRun = D(4e6)
@@ -41,6 +42,7 @@ describe('prestige: Sleep in the Coffin', () => {
     expect(s.upgrades.levels).toEqual({ deepSleep: 1 })
     expect(s.upgrades.unlocked.sharpFangs).toBe(true)
     expect(s.combat.stage).toBe(1)
+    expect(s.combat.highestStage).toBe(1)
     expect(s.combat.enemyHp.toNumber()).toBe(10)
     expect(s.stats.bloodEarnedRun.toNumber()).toBe(0)
     expect(s.stats.maxStage).toBe(40)
@@ -62,6 +64,7 @@ describe('prestige: Sleep in the Coffin', () => {
     s.stats.bloodEarnedRun = D(1e6)
     prestige(s, coffin)
     expect(s.combat.stage).toBe(5)
+    expect(s.combat.highestStage).toBe(5)
     expect(s.combat.enemyHp.toNumber()).toBeCloseTo(10 * 1.14 ** 4)
   })
 })
