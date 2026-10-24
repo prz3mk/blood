@@ -1,5 +1,14 @@
 import { markRaw, ref } from 'vue'
-import { bite, createInitialState, createLoop, tick, TICK_SECONDS } from '../engine'
+import type { UpgradeDef } from '../data/upgrades'
+import {
+  bite,
+  buyUpgrade,
+  createInitialState,
+  createLoop,
+  tick,
+  TICK_SECONDS,
+  type BuyMode,
+} from '../engine'
 
 const UI_REFRESH_MS = 100
 
@@ -27,4 +36,10 @@ export function startGame(): void {
 export function playerBite(): void {
   bite(state)
   frame.value++
+}
+
+export const buyMode = ref<BuyMode>(1)
+
+export function playerBuy(def: UpgradeDef): void {
+  if (buyUpgrade(state, def, buyMode.value) > 0) frame.value++
 }

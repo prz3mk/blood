@@ -24,12 +24,20 @@ export interface Stats {
   kills: number
   bossKills: number
   clicks: number
+  crits: number
   maxStage: number
+}
+
+export interface Upgrades {
+  levels: Record<string, number>
+  /** Sticky: once shown, stays shown. */
+  unlocked: Record<string, boolean>
 }
 
 export interface GameState {
   resources: Resources
   combat: Combat
+  upgrades: Upgrades
   stats: Stats
 }
 
@@ -37,6 +45,7 @@ export function createInitialState(): GameState {
   return {
     resources: { blood: D(0), bones: D(0), essence: D(0) },
     combat: { stage: 1, enemyIndex: 0, enemyHp: D(COMBAT.enemyHpBase) },
+    upgrades: { levels: {}, unlocked: {} },
     stats: {
       playTime: 0,
       bloodEarnedRun: D(0),
@@ -44,6 +53,7 @@ export function createInitialState(): GameState {
       kills: 0,
       bossKills: 0,
       clicks: 0,
+      crits: 0,
       maxStage: 1,
     },
   }

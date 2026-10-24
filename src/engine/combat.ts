@@ -1,6 +1,8 @@
 import { COMBAT, ZONES } from '../data/combat'
+import { CRIT_MULT } from '../data/upgrades'
 import { D, type Decimal } from './decimal'
 import type { GameState } from './state'
+import { statBonus } from './upgrades'
 
 export const isBoss = (enemyIndex: number) => enemyIndex >= COMBAT.enemiesPerStage
 
@@ -24,9 +26,15 @@ export function enemyName(state: GameState): string {
   return zone.enemies[(stage + enemyIndex) % zone.enemies.length]
 }
 
-// Upgrades (step 4) plug in here.
-export const biteDamage = (_state: GameState): Decimal => D(COMBAT.baseBiteDamage)
-export const autoDps = (_state: GameState): Decimal => D(0)
+export const biteDamage = (state: GameState): Decimal =>
+  D(COMBAT.baseBiteDamage + statBonus(state, 'biteFlat')).mul(1 + statBonus(state, 'biteMult'))
+
+export const autoDps = (state: GameState): Decimal =>
+  D(statBonus(state, 'dpsFlat')).mul(1 + statBonus(state, 'dpsMult'))
+
+export const critChance = (state: GameState): number => Math.min(1, statBonus(state, 'critChance'))
+
+export const bloodMult = (state: GameState): number => 1 + statBonus(state, 'bloodMult')
 
 function spawn(state: GameState): void {
   const c = state.combat
@@ -36,7 +44,7 @@ function spawn(state: GameState): void {
 function kill(state: GameState): void {
   const c = state.combat
   const { resources: r, stats } = state
-  const blood = bloodDrop(c.stage)
+  const blood = bloodDrop(c.stage).mul(bloodMult(state))
   r.blood = r.blood.add(blood)
   stats.bloodEarnedRun = stats.bloodEarnedRun.add(blood)
   stats.bloodEarnedTotal = stats.bloodEarnedTotal.add(blood)
@@ -68,7 +76,12 @@ export function dealDamage(state: GameState, amount: Decimal): void {
   }
 }
 
-export function bite(state: GameState): void {
+export function bite(state: GameState, rng: () => number = Math.random): void {
   state.stats.clicks++
-  dealDamage(state, biteDamage(state))
+  let dmg = biteDamage(state)
+  if (rng() < critChance(state)) {
+    dmg = dmg.mul(CRIT_MULT)
+    state.stats.crits++
+  }
+  dealDamage(state, dmg)
 }

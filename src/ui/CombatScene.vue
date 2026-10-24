@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { COMBAT } from '../data/combat'
-import { enemyMaxHp, enemyName, formatNumber, isBoss } from '../engine'
+import { autoDps, biteDamage, enemyMaxHp, enemyName, formatNumber, isBoss } from '../engine'
 import { frame, playerBite, state } from './game'
 
 const view = computed(() => {
@@ -17,6 +17,8 @@ const view = computed(() => {
     hp: formatNumber(c.enemyHp),
     maxHp: formatNumber(max),
     pct: c.enemyHp.div(max).toNumber() * 100,
+    bite: formatNumber(biteDamage(state)),
+    dps: formatNumber(autoDps(state)),
   }
 })
 </script>
@@ -29,7 +31,7 @@ const view = computed(() => {
       <span class="bar"><span class="fill" :style="{ width: view.pct + '%' }" /></span>
       <span class="hp">{{ view.hp }} / {{ view.maxHp }}</span>
     </button>
-    <div class="hint">Tap to bite</div>
+    <div class="hint">Tap to bite · Bite {{ view.bite }} · DPS {{ view.dps }}</div>
   </section>
 </template>
 
