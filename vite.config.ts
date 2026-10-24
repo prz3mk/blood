@@ -4,6 +4,8 @@ import { VitePWA } from 'vite-plugin-pwa'
 
 // https://vite.dev/config/
 export default defineConfig({
+  // Sub-path hosting (GitHub Pages sets /blood/); local dev stays at /.
+  base: process.env.BASE_PATH ?? '/',
   plugins: [
     vue(),
     VitePWA({
