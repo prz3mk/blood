@@ -10,7 +10,9 @@ import {
   bossDmgMult,
   critChance,
   formatDuration,
+  allDamageMult,
   offlineLimitHours,
+  wraithDps,
 } from '../../engine'
 import { CRIT_MULT } from '../../data/upgrades'
 import { fmt, frame, state } from '../game'
@@ -26,7 +28,9 @@ const groups = computed(() => {
       rows: [
         ['Bite damage', fmt(biteDamage(state))],
         ['Crit chance', `${pct(critChance(state))} (×${CRIT_MULT})`],
+        ['All damage', `×${fmt(allDamageMult(state))}`],
         ['Ghoul DPS', fmt(autoDps(state))],
+        ['Wraith DPS', fmt(wraithDps(state))],
         ['Bat bites', `${autoBitesPerSecond(state)}/s`],
         ['Damage vs boss', `×${fmt(bossDmgMult(state))}`],
       ],
@@ -42,7 +46,7 @@ const groups = computed(() => {
     {
       title: 'Records',
       rows: [
-        ['Highest stage', fmt(s.maxStage)],
+        ['Highest Village stage', fmt(s.maxStage)],
         ['Enemies slain', fmt(s.kills)],
         ['Bosses slain', fmt(s.bossKills)],
         ['Bites', fmt(s.clicks)],
@@ -50,6 +54,7 @@ const groups = computed(() => {
         ['Crits', fmt(s.crits)],
         ['Blood earned', fmt(s.bloodEarnedTotal)],
         ['Bones earned', fmt(s.bonesEarnedTotal)],
+        ['Souls earned', fmt(s.soulsEarnedTotal)],
         ...PRESTIGE_LAYERS.map((l) => [l.name, fmt(s.prestiges[l.id] ?? 0)]),
         ['Play time', formatDuration(s.playTime)],
       ],

@@ -25,7 +25,7 @@ describe('prestige: Sleep in the Coffin', () => {
 
   it('resets run, keeps essence, essence upgrades, settings, stats', () => {
     const s = createInitialState()
-    s.resources = { blood: D(500), bones: D(20), essence: D(2) }
+    s.resources = { blood: D(500), bones: D(20), essence: D(2), souls: D(7) }
     s.upgrades.levels = { sharpFangs: 10, boneArmor: 3, deepSleep: 1 }
     s.upgrades.unlocked = { sharpFangs: true }
     s.combat.stage = 40

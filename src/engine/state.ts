@@ -6,9 +6,15 @@ export interface Resources {
   blood: Decimal
   bones: Decimal
   essence: Decimal
+  souls: Decimal
 }
 
 export interface Combat {
+  /** Active zone id (data/combat ZONES). stage/highestStage are for it. */
+  zone: string
+  /** Saved stage / highest stage of inactive zones, by zone id. */
+  zoneStage: Record<string, number>
+  zoneHighest: Record<string, number>
   /** Stage number, from 1. */
   stage: number
   /** Highest stage unlocked this run (boss of the one below beaten). */
@@ -27,6 +33,7 @@ export interface Stats {
   bloodEarnedRun: Decimal
   bloodEarnedTotal: Decimal
   bonesEarnedTotal: Decimal
+  soulsEarnedTotal: Decimal
   kills: number
   bossKills: number
   clicks: number
@@ -63,14 +70,20 @@ export interface GameState {
 
 export function createInitialState(): GameState {
   return {
-    resources: { blood: D(0), bones: D(0), essence: D(0) },
-    combat: { stage: 1, highestStage: 1, enemyIndex: 0, enemyHp: D(COMBAT.enemyHpBase), autoBiteProgress: 0 },
+    resources: { blood: D(0), bones: D(0), essence: D(0), souls: D(0) },
+    combat: {
+      zone: 'village',
+      zoneStage: {},
+      zoneHighest: {},
+      stage: 1,
+      highestStage: 1, enemyIndex: 0, enemyHp: D(COMBAT.enemyHpBase), autoBiteProgress: 0 },
     upgrades: { levels: {}, unlocked: {} },
     stats: {
       playTime: 0,
       bloodEarnedRun: D(0),
       bloodEarnedTotal: D(0),
       bonesEarnedTotal: D(0),
+      soulsEarnedTotal: D(0),
       kills: 0,
       bossKills: 0,
       clicks: 0,
