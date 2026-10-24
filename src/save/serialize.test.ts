@@ -32,6 +32,13 @@ describe('save', () => {
     expect('junk' in state.resources).toBe(false)
   })
 
+  it('migrates v1: stages up to current one count as unlocked', () => {
+    const { state } = fromSaveData({ version: 1, savedAt: 0, state: { combat: { stage: 33 } } })
+    expect(state.combat.stage).toBe(33)
+    expect(state.combat.highestStage).toBe(33)
+    expect(state.settings.autoAdvance).toBe(true)
+  })
+
   it('rejects garbage and newer versions', () => {
     expect(() => decode('not a save')).toThrow()
     expect(() => decode(encode({ version: SAVE_VERSION + 1, savedAt: 0, state: {} }))).toThrow(/newer/)

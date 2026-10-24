@@ -2,7 +2,7 @@ import { compressToBase64, decompressFromBase64 } from 'lz-string'
 import { D, Decimal } from '../engine/decimal'
 import { createInitialState, type GameState } from '../engine/state'
 
-export const SAVE_VERSION = 1
+export const SAVE_VERSION = 2
 
 export interface SaveData {
   version: number
@@ -17,7 +17,14 @@ type Json = Record<string, unknown>
  * migrations[v] upgrades raw save data from version v to v+1.
  * Never edit an existing entry; append a new one and bump SAVE_VERSION.
  */
-const migrations: Record<number, (data: Json) => Json> = {}
+const migrations: Record<number, (data: Json) => Json> = {
+  // v2: stage travel. Everything up to the current stage counts as unlocked.
+  1: (d) => {
+    const combat = (d.state as Json | undefined)?.combat as Json | undefined
+    if (combat && typeof combat.stage === 'number') combat.highestStage = combat.stage
+    return d
+  },
+}
 
 export function migrate(data: SaveData): SaveData {
   let d = data as unknown as Json

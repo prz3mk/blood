@@ -2,7 +2,7 @@
 import { computed } from 'vue'
 import { COMBAT } from '../data/combat'
 import { autoBitesPerSecond, autoDps, biteDamage, enemyMaxHp, enemyName, isBoss } from '../engine'
-import { fmt, frame, playerBite, state } from './game'
+import { fmt, frame, playerBite, playerGoToStage, state, toggleAutoAdvance } from './game'
 
 const view = computed(() => {
   void frame.value
@@ -11,6 +11,8 @@ const view = computed(() => {
   const max = enemyMaxHp(c.stage, boss)
   return {
     stage: c.stage,
+    highest: c.highestStage,
+    auto: state.settings.autoAdvance,
     boss,
     progress: boss ? 'BOSS' : `Enemy ${c.enemyIndex + 1} / ${COMBAT.enemiesPerStage}`,
     name: enemyName(state),
@@ -26,7 +28,27 @@ const view = computed(() => {
 
 <template>
   <section class="scene">
-    <div class="meta">Stage {{ view.stage }} · {{ view.progress }}</div>
+    <div class="nav">
+      <button aria-label="First stage" :disabled="view.stage <= 1" @click="playerGoToStage(1)">«</button>
+      <button aria-label="Previous stage" :disabled="view.stage <= 1" @click="playerGoToStage(view.stage - 1)">‹</button>
+      <div class="where">
+        <div>
+          Stage {{ view.stage }}<span v-if="view.highest > view.stage" class="dim"> / {{ view.highest }}</span>
+        </div>
+        <div class="dim">{{ view.progress }}</div>
+      </div>
+      <button aria-label="Next stage" :disabled="view.stage >= view.highest" @click="playerGoToStage(view.stage + 1)">›</button>
+      <button aria-label="Highest stage" :disabled="view.stage >= view.highest" @click="playerGoToStage(view.highest)">»</button>
+    </div>
+    <button
+      class="mode"
+      :class="{ farm: !view.auto }"
+      :aria-pressed="!view.auto"
+      :title="view.auto ? 'After the boss: go to the next stage' : 'After the boss: repeat this stage'"
+      @click="toggleAutoAdvance"
+    >
+      {{ view.auto ? '▶▶ Auto-advance' : '⟳ Farming this stage' }}
+    </button>
     <button class="enemy" :class="{ boss: view.boss }" @pointerdown.prevent="playerBite">
       <span class="name">{{ view.name }}</span>
       <span class="bar hp-bar"><span class="fill" :style="{ width: view.pct + '%' }" /></span>
@@ -45,9 +67,38 @@ const view = computed(() => {
   gap: 8px;
   justify-items: center;
 }
-.meta {
+.meta,
+.dim {
   color: var(--muted);
   font-size: 14px;
+}
+.nav {
+  width: min(100%, 420px);
+  display: grid;
+  grid-template-columns: auto auto 1fr auto auto;
+  gap: 6px;
+  align-items: center;
+}
+.nav > button {
+  min-width: 40px;
+  min-height: 40px;
+  padding: 0 8px;
+  font-size: 18px;
+  line-height: 1;
+}
+.where {
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+.mode {
+  font-size: 13px;
+  padding: 4px 12px;
+  border-radius: 999px;
+  color: var(--muted);
+}
+.mode.farm {
+  color: var(--text);
+  border-color: var(--blood);
 }
 .enemy {
   width: min(100%, 420px);
