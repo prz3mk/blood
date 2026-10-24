@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { COMBAT } from '../data/combat'
-import { autoBitesPerSecond, autoDps, biteDamage, enemyMaxHp, enemyName, isBoss } from '../engine'
+import { autoBitesPerSecond, autoDps, biteDamage, currentDrops, enemyMaxHp, enemyName, isBoss } from '../engine'
+import DamageNumbers from './DamageNumbers.vue'
 import { fmt, frame, playerBite, playerGoToStage, state, toggleAutoAdvance } from './game'
 
 const view = computed(() => {
@@ -9,7 +10,10 @@ const view = computed(() => {
   const c = state.combat
   const boss = isBoss(c.enemyIndex)
   const max = enemyMaxHp(c.stage, boss)
+  const drops = currentDrops(state)
   return {
+    dropBlood: fmt(drops.blood),
+    dropBones: drops.bones.gt(0) ? fmt(drops.bones) : null,
     stage: c.stage,
     highest: c.highestStage,
     auto: state.settings.autoAdvance,
@@ -53,6 +57,11 @@ const view = computed(() => {
       <span class="name">{{ view.name }}</span>
       <span class="bar hp-bar"><span class="fill" :style="{ width: view.pct + '%' }" /></span>
       <span class="hp">{{ view.hp }} / {{ view.maxHp }}</span>
+      <span class="drops">
+        Drops <b class="blood">{{ view.dropBlood }} Blood</b
+        ><template v-if="view.dropBones"> · <b class="bones">{{ view.dropBones }} Bones</b></template>
+      </span>
+      <DamageNumbers />
     </button>
     <div class="meta">
       Bite {{ view.bite }} · DPS {{ view.dps }}<template v-if="view.bats"> · Bats {{ view.bats }}/s</template>
@@ -101,6 +110,7 @@ const view = computed(() => {
   border-color: var(--blood);
 }
 .enemy {
+  position: relative;
   width: min(100%, 420px);
   padding: 28px 16px;
   display: grid;
@@ -122,6 +132,20 @@ const view = computed(() => {
 .hp-bar {
   height: 12px;
   border-radius: 6px;
+}
+.drops {
+  font-size: 13px;
+  color: var(--muted);
+}
+.drops b {
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+.drops .blood {
+  color: #ff8a9b;
+}
+.drops .bones {
+  color: #e6dcc3;
 }
 .hp {
   font-size: 14px;

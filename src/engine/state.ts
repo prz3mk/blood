@@ -42,6 +42,8 @@ export interface Settings {
   autoBuyBlood: boolean
   /** true: next stage after boss; false: farm (repeat current stage). */
   autoAdvance: boolean
+  /** Floating damage numbers over the enemy. */
+  damageNumbers: boolean
   notation: Notation
 }
 
@@ -77,6 +79,6 @@ export function createInitialState(): GameState {
       maxStage: 1,
       prestiges: {},
     },
-    settings: { autoBuyBlood: true, autoAdvance: true, notation: 'scientific' },
+    settings: { autoBuyBlood: true, autoAdvance: true, damageNumbers: true, notation: 'scientific' },
   }
 }

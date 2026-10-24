@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { COMBAT } from '../data/combat'
-import { bite, bloodDrop, bonesDrop, dealDamage, enemyMaxHp, goToStage } from './combat'
+import { bite, bloodDrop, bonesDrop, currentDrops, dealDamage, enemyMaxHp, goToStage, setHitListener, spawn, type Hit } from './combat'
+import { tick } from './tick'
 import { D } from './decimal'
 import { createInitialState } from './state'
 
@@ -91,5 +92,40 @@ describe('stage travel', () => {
     expect(s.combat.stage).toBe(5)
     goToStage(s, 0)
     expect(s.combat.stage).toBe(1)
+  })
+})
+
+describe('hit events', () => {
+  it('reports source, crit and boss-multiplied amount', () => {
+    const hits: Hit[] = []
+    setHitListener((h) => hits.push(h))
+    try {
+      const s = createInitialState()
+      s.upgrades.levels = { criticalBite: 1, batSwarm: 1, ghoulServant: 1, boneArmor: 5 }
+      bite(s, () => 0) // crit
+      tick(s, 1) // ghoul 2 dmg + one bat bite
+      expect(hits[0]).toMatchObject({ source: 'tap', crit: true })
+      expect(hits[0].amount.toNumber()).toBe(5)
+      expect(hits.map((h) => h.source)).toContain('ghoul')
+      expect(hits.map((h) => h.source)).toContain('bat')
+      // On the boss, Bone Armor (x2) shows in the number.
+      s.combat.enemyIndex = COMBAT.enemiesPerStage
+      spawn(s)
+      bite(s, () => 0.99)
+      expect(hits.at(-1)!.amount.toNumber()).toBe(2)
+    } finally {
+      setHitListener(null)
+    }
+  })
+})
+
+describe('currentDrops', () => {
+  it('normal enemy: Blood only; boss: Blood + Bones, with multipliers', () => {
+    const s = createInitialState()
+    s.upgrades.levels = { bloodSiphon: 2, ossuary: 4 }
+    expect(currentDrops(s).blood.toNumber()).toBeCloseTo(1.1)
+    expect(currentDrops(s).bones.toNumber()).toBe(0)
+    s.combat.enemyIndex = COMBAT.enemiesPerStage
+    expect(currentDrops(s).bones.toNumber()).toBe(2)
   })
 })
